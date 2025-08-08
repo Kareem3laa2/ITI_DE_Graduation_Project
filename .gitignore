@@ -1,0 +1,5 @@
+.env
+secrets
+nyc_silver_combined.csv
+nyc_silver.csv
+logs
