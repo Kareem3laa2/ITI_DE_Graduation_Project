@@ -308,6 +308,19 @@ services:
       - spark-worker
     networks:
       - NYC_network
+      
+  dbt:
+    image: ghcr.io/dbt-labs/dbt-snowflake:1.7.0
+    container_name: nyc-dbt
+    environment:
+      - DBT_PROFILES_DIR=/root/.dbt
+    volumes:
+      - ./dbt:/usr/app
+      - ./dbt/profiles:/root/.dbt
+    working_dir: /usr/app
+    entrypoint: ["sleep", "infinity"]  # Keep container running
+    networks:
+      - NYC_network
 
 
 

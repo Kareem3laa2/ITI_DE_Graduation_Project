@@ -1,0 +1,169 @@
+version: 2
+
+models:
+  # DIMENSIONS
+  - name: dim_borough
+    description: "Borough dimension table. One row per unique borough."
+    columns:
+      - name: borough_id
+        description: "Integer surrogate key for borough"
+        tests:
+          - unique
+          - not_null
+      - name: borough_name
+        description: "NYC borough name"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['MANHATTAN', 'BROOKLYN', 'QUEENS', 'BRONX', 'STATEN ISLAND']
+
+  - name: dim_tax_class
+    description: "Tax class dimension table. One row per unique combination of tax class values."
+    columns:
+      - name: tax_class_id
+        description: "Integer surrogate key for tax class combination"
+        tests:
+          - unique
+          - not_null
+      - name: tax_class_at_present
+        description: "Current tax class"
+        tests:
+          - not_null
+      - name: tax_class_at_time_of_sale
+        description: "Tax class at time of sale"
+        tests:
+          - not_null
+
+  - name: dim_building_class
+    description: "Building class dimension table. One row per unique combination of building class values."
+    columns:
+      - name: building_class_id
+        description: "Integer surrogate key for building class combination"
+        tests:
+          - unique
+          - not_null
+      - name: building_class_at_present
+        description: "Current building class"
+        tests:
+          - not_null
+      - name: building_class_at_time_of_sale
+        description: "Building class at time of sale"
+        tests:
+          - not_null
+      - name: building_class_category
+        description: "Building class category code"
+
+  - name: dim_date
+    description: "Date dimension table. One row per calendar date."
+    columns:
+      - name: date_id
+        description: "Date key in YYYYMMDD format (deterministic natural surrogate key)"
+        tests:
+          - unique
+          - not_null
+      - name: full_date
+        description: "Full date"
+        tests:
+          - not_null
+      - name: year
+        description: "Year"
+        tests:
+          - not_null
+          - accepted_values:
+              values: [2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029, 2030]
+
+  - name: dim_property
+    description: "Property dimension table. One row per unique property."
+    columns:
+      - name: property_id
+        description: "Integer surrogate key for property"
+        tests:
+          - unique
+          - not_null
+      - name: borough_id
+        description: "Foreign key to borough dimension"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_borough')
+              field: borough_id
+      - name: address
+        description: "Property address"
+      - name: block
+        description: "Property block number"
+      - name: lot
+        description: "Property lot number"
+
+  # FACTS
+  - name: fact_sales
+    description: |
+      Property sales fact table.
+      Grain: one row per unique (sale_date_id, property_id, building_class_id, tax_class_id, sale_price).
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - sale_date_id
+            - property_id
+            - building_class_id
+            - tax_class_id
+            - sale_price
+    columns:
+      - name: fact_id
+        description: "Integer surrogate key for fact record"
+        tests:
+          - unique
+          - not_null
+      
+      - name: sale_date_id
+        description: "Foreign key to date dimension"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_date')
+              field: date_id
+      
+      - name: property_id
+        description: "Foreign key to property dimension"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_property')
+              field: property_id
+      
+      - name: building_class_id
+        description: "Foreign key to building class dimension"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_building_class')
+              field: building_class_id
+      
+      - name: tax_class_id
+        description: "Foreign key to tax class dimension"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_tax_class')
+              field: tax_class_id
+      
+      - name: sale_price
+        description: "Property sale price"
+        tests:
+          - not_null
+      
+      - name: residential_units
+        description: "Number of residential units"
+      
+      - name: commercial_units
+        description: "Number of commercial units"
+      
+      - name: total_units
+        description: "Total number of units"
+      
+      - name: land_square_feet
+        description: "Land square footage"
+        tests:
+          - not_null
+      
+      - name: gross_square_feet
+        description: "Gross square footage"

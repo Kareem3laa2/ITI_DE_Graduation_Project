@@ -1,0 +1,55 @@
+# models/staging/_staging__sources.yml
+version: 2
+
+sources:
+  - name: nyc_staging
+    description: "Staged NYC property data from ETL pipeline"
+    database: NYC_PROPERTIES
+    schema: STAGING
+    
+    tables:
+      - name: silver_nyc_properties
+        description: "Clean NYC property data from Spark silver layer"
+        columns:
+          - name: address
+            description: "Property address"
+          - name: block
+            description: "Property block number"
+          - name: borough_name
+            description: "NYC Borough name"
+            tests:
+              - not_null
+          - name: building_class_at_present
+            description: "Current building class"
+          - name: building_class_at_time_of_sale
+            description: "Building class at time of sale"
+          - name: building_class_category
+            description: "Building class category code"
+          - name: commercial_units
+            description: "Number of commercial units (varchar)"
+          - name: gross_square_feet
+            description: "Gross square footage"
+          - name: land_square_feet
+            description: "Land square footage"
+          - name: lot
+            description: "Property lot number"
+          - name: neighborhood
+            description: "Property neighborhood code"
+          - name: residential_units
+            description: "Number of residential units"
+          - name: sale_date
+            description: "Date of property sale"
+            tests:
+              - not_null
+          - name: sale_price
+            description: "Property sale price"
+          - name: tax_class_at_present
+            description: "Current tax class"
+          - name: tax_class_at_time_of_sale
+            description: "Tax class at time of sale (number)"
+          - name: total_units
+            description: "Total number of units"
+          - name: year_built
+            description: "Year the property was built"
+          - name: zip_code
+            description: "Property ZIP code (number)"

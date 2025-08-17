@@ -1,0 +1,43 @@
+name: 'nyc_properties'
+version: '1.0.0'
+config-version: 2
+
+profile: 'NYC_Properties_DBT'
+
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+target-path: "target"
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+models:
+  nyc_properties:
+    # Source data cleaning and standardization
+    staging:
+      +materialized: view
+    
+    # Final business-ready models
+    marts:
+      +materialized: table
+      +schema: gold  # This creates tables in NYC_PROPERTIES.DWH schema
+      
+      dimensions:
+        +materialized: table
+        
+      facts:
+        +materialized: table
+
+# Global configurations
+vars:
+  start_date: '2015-01-01'
+  end_date: '2030-12-31'
+
+seeds:
+  nyc_properties:
+    +quote_columns: false
