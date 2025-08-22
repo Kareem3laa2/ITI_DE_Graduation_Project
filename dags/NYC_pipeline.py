@@ -28,6 +28,12 @@ with DAG(
                        /opt/bitnami/spark/bin/spark-submit \
                        --master spark://spark-master:7077 /opt/spark-apps/scripts/stage_to_snowflake.py'
    )
+    
+    dbt_model_building = BashOperator(
+    task_id="dbt_modeling",
+    bash_command='docker exec nyc-dbt bash -c "cd /usr/app/NYC_Properties_DBT && dbt run"'
+   )
 
 
-    store_hdfs_bronze >> clean_to_silver >> stage_to_snowflake
+
+    store_hdfs_bronze >> clean_to_silver >> stage_to_snowflake >> dbt_model_building

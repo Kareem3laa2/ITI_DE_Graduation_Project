@@ -21,6 +21,7 @@ models:
     # Source data cleaning and standardization
     staging:
       +materialized: view
+      +schema: gold
     
     # Final business-ready models
     marts:
